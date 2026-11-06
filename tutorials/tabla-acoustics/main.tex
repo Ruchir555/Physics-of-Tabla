@@ -1,0 +1,151 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=0.87in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{lmodern}\usepackage{microtype}
+\usepackage{amsmath,amssymb,mathtools,bm}\usepackage{graphicx,booktabs,array,tabularx,longtable}
+\usepackage[svgnames]{xcolor}\usepackage{hyperref}\usepackage{fancyhdr}\usepackage{enumitem}
+\hypersetup{colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue,citecolor=MidnightBlue,pdftitle={The Physics of Tabla Vibration and Musical Harmony}}
+\pagestyle{fancy}\fancyhf{}\lhead{Physics of the Tabla}\rhead{\thepage}\setlength{\headheight}{14pt}
+\newcommand{\fig}[3]{\begin{figure}[htbp]\centering\includegraphics[width=#1\linewidth]{figures/#2}\caption{#3}\end{figure}}
+\title{\Huge The Physics of Tabla Vibration\\[3pt]\Large Membrane eigenmodes, the syahi, Fourier spectra, and musical consonance}
+\author{An illustrated, reproducible educational tutorial}
+\date{November 2026}
+\begin{document}\maketitle
+\begin{abstract}
+Why can a tabla produce a recognizable pitch when most drum membranes have inharmonic normal modes? Why does a G\(\sharp\) dayan often sound consonant with a composition in C\(\sharp\)? This tutorial develops harmonic analysis, interval ratios, circular-membrane eigenmodes, central mass loading, and a simple numerical eigenvalue model. It distinguishes exact analytical results, pedagogical models, and the experimentally richer behaviour of a real tabla. The accompanying Python code regenerates all figures.
+\end{abstract}
+\tableofcontents\clearpage
+\section{What does it mean for a note to have harmonics?}
+A musical tone commonly contains more than one sinusoidal component. In the simplest periodic, \emph{harmonic} model,
+\begin{equation}x(t)=\sum_{n=1}^{\infty}A_n\sin(2\pi n f_0t+\phi_n),\qquad f_n=nf_0.\end{equation}
+The frequency \(f_0\) is the fundamental; the second harmonic \(2f_0\) is one octave higher; the third harmonic \(3f_0\) lies an octave and a perfect fifth above; and the fourth harmonic lies two octaves above. Harmonic amplitudes and phases contribute to the waveform, and the evolving spectrum and envelope contribute to the instrument's timbre. Real instruments may also have inharmonic partials and nonstationary attacks.
+
+A Fourier transform decomposes a signal into its constituent frequencies. A pure, infinitely long sinusoid has a sharp spectral line; an actual recorded sound produces broadened peaks because of finite duration, decay, noise, and frequency variation. Figures here are \emph{constructed line spectra}, not measured recordings. For visual clarity the illustrative amplitudes are \(A_n=1/n\), which are not a claimed model for the spectral amplitudes of a tabla.
+\fig{.96}{harmonic_spectra.pdf}{Idealized harmonic series for C\(\sharp\)4 and G\(\sharp\)4. The shaded band highlights the near coincidence around 831 Hz; numbers above the lines indicate harmonic order.}
+\section{Why C\texorpdfstring{$\sharp$}{sharp} and G\texorpdfstring{$\sharp$}{sharp} work together}
+In twelve-tone equal temperament, C\(\sharp\)4 has frequency \(f_C\simeq277.1826\) Hz and G\(\sharp\)4 has \(f_G\simeq415.3047\) Hz. They are seven semitones apart, an equal-tempered perfect fifth:
+\begin{equation}\frac{f_G}{f_C}=2^{7/12}\simeq1.498307\approx\frac32.\end{equation}
+The third harmonic of C\(\sharp\) and second of G\(\sharp\) almost match:
+\begin{equation}3f_C\simeq831.548\ \mathrm{Hz},\qquad2f_G\simeq830.609\ \mathrm{Hz}.\end{equation}
+For a justly tuned fifth, \(f_G/f_C=3/2\) exactly and these harmonics coincide. The same matching extends to harmonic pairs \((6,4),(9,6),\dots\). The note's identity depends on its octave: a G\(\sharp\) \emph{below} the chosen C\(\sharp\) is a fourth below rather than a fifth above, though its pitch class is still G\(\sharp\).
+
+\subsection{Consonance versus physical resonance}
+\emph{Consonance} is a perceptual description of how two tones relate. Harmonic coincidence, simplicity of frequency ratios, auditory roughness, and cultural or musical expectations all matter. \emph{Resonance} is a dynamical response: a particular vibrational mode receives energy particularly efficiently when driven close to its natural frequency, with efficiency depending on coupling and damping. Harmonic overlap makes two pitched sounds compatible, but does not by itself establish large sympathetic vibration of a tabla.
+
+\subsection{Beating of nearly matching partials}
+For two sinusoids at \(f_a\) and \(f_b\),
+\begin{equation}\cos(2\pi f_at)+\cos(2\pi f_bt)=2\cos\!\left(\pi(f_a-f_b)t\right)\cos\!\left(\pi(f_a+f_b)t\right).\end{equation}
+The magnitude of the slow envelope repeats at the beat frequency \(|f_a-f_b|\). Here \(|3f_C-2f_G|\simeq0.939\) Hz. This beating is audible only when the relevant partials are appreciable and sustain long enough; tabla transients can make it less obvious.
+\fig{.95}{beating.pdf}{Superposition of the close partials at roughly 831 Hz. The orange envelope repeats at approximately 0.94 Hz. This is a synthesized illustration, not tabla audio.}
+
+\section{Other consonant intervals and shared harmonics}
+For two ideal harmonic spectra with \(f_2/f_1=p/q\) in lowest terms, the \(p\)-th harmonic of the lower note equals the \(q\)-th harmonic of the higher note:
+\begin{equation}pf_1=qf_2.\end{equation}
+Simple ratios produce overlaps among relatively low harmonics. That is one influential acoustic explanation for the consonance of intervals; it is not a complete psychophysical theory. In equal temperament, except for octaves, the simple ratios below are approximations rather than exact identities.
+\begin{center}\small\begin{tabular}{llll}\toprule
+Interval & Just ratio (upper/lower) & Overlap (lower/upper) & Relative to C\(\sharp\) Sa\\\midrule
+Unison & 1:1 & 1st / 1st & C\(\sharp\)\\
+Octave & 2:1 & 2nd / 1st & C\(\sharp\) (upper)\\
+Perfect fifth & 3:2 & 3rd / 2nd & G\(\sharp\) (Pa)\\
+Perfect fourth & 4:3 & 4th / 3rd & F\(\sharp\) (Ma)\\
+Major third & 5:4 & 5th / 4th & E\(\sharp\) (shuddha Ga)\\
+Minor third & 6:5 & 6th / 5th & E (komal Ga)\\
+Major sixth & 5:3 & 5th / 3rd & A\(\sharp\) (shuddha Dha)\\
+Minor sixth & 8:5 & 8th / 5th & A (komal Dha)\\
+Major second & 9:8 & 9th / 8th & D\(\sharp\) (shuddha Re)\\\bottomrule
+\end{tabular}\end{center}
+The swara associations above are pedagogical labels, not a claim that all ragas employ these precise ratios. Intonation varies with raga and tradition. For a C\(\sharp\)-tonic performance, C\(\sharp\) (Sa) and G\(\sharp\) (Pa) are especially straightforward consonant reference pitches; F\(\sharp\) (Ma) can also be consonant. Actual tabla tuning is determined by performance convention, register, repertoire, and desired blend, not ratios alone.
+
+\section{An ideal circular membrane: from wave equation to Bessel functions}
+Take a thin, isotropic, uniformly tensioned circular membrane of radius \(R\), areal density \(\sigma\) (kg/m\(^2\)), and isotropic tension \(T\) (N/m). Let \(u(r,\theta,t)\) be its small transverse displacement. The linear wave equation is
+\begin{equation}\sigma\partial_t^2u=T\nabla^2u,\qquad c=\sqrt{T/\sigma},\end{equation}
+where the polar-coordinate Laplacian is
+\begin{equation}\nabla^2=\partial_r^2+\frac1r\partial_r+\frac1{r^2}\partial_\theta^2.\end{equation}
+Seek a separable normal mode \(u=F(r)\Theta(\theta)\cos(\omega t+\phi)\). Periodicity in \(\theta\) fixes integer azimuthal order \(m\ge0\), with \(\Theta\propto\cos m\theta\) or \(\sin m\theta\). The radial equation becomes
+\begin{equation}r^2F''+rF'+(k^2r^2-m^2)F=0,\qquad k=\omega/c.\end{equation}
+This is Bessel's equation. The finite-at-origin solution is \(F(r)=J_m(kr)\); the divergent \(Y_m\) solution is excluded. The fixed-edge boundary \(F(R)=0\) yields \(kR=j_{mn}\), the \(n\)-th positive zero of \(J_m\). Thus
+\begin{equation}\boxed{f_{mn}=\frac{j_{mn}}{2\pi R}\sqrt{\frac{T}{\sigma}}.}\end{equation}
+One possible real-valued mode shape is
+\begin{equation}u_{mn}=A J_m(j_{mn}r/R)\cos(m\theta+\alpha)\cos(2\pi f_{mn}t+\phi).\end{equation}
+Two orthogonal angular orientations occur for \(m>0\), so these ideal rotationally symmetric modes are degenerate.
+\fig{.99}{membrane_modes.pdf}{Four modes of an ideal uniform membrane. Black curves indicate nodes. The ratios are relative to the \((0,1)\) mode.}
+\subsection{Why an ordinary membrane is not harmonic}
+The first several Bessel zeros include \(j_{01}=2.4048\), \(j_{11}=3.8317\), \(j_{21}=5.1356\), and \(j_{02}=5.5201\). Their frequency ratios are roughly \(1,1.593,2.136,2.296\), not \(1,2,3,4\). Thus the ordinary circular membrane's normal modes are not a string-like harmonic series. A recognizable pitch also depends on excitation, damping, and the ear's tendency to infer pitch from partial patterns, so inharmonicity is not the sole factor in perceived pitch.
+
+\section{The syahi: changing the membrane's mass distribution}
+The central black loading on the right-hand tabla (dayan), called the \emph{syahi}, produces a nonuniform areal density. In a rotationally symmetric approximation, \(\sigma=\sigma(r)\). For constant tension, the mode equation becomes
+\begin{equation}\boxed{-T\nabla^2\psi_n=\omega_n^2\sigma(r)\psi_n,\quad \psi_n(R,\theta)=0.}\end{equation}
+This is a \emph{generalized eigenvalue problem}: the mass density is a weight on the right, and altering it changes the eigenvalues and eigenfunctions. The real instrument also contains multiple membrane layers, complex boundary conditions, damping, air coupling, and possibly asymmetric loading; this elementary model isolates one physical mechanism. Early and subsequent studies connect the central loading to the nearly harmonic low-mode spectrum \cite{raman1920,raman1934,ramakrishnan1954,krishnamurthy1994,eigenspectra2009}.
+
+\subsection{Energy interpretation and Rayleigh quotient}
+Multiply the mode equation by \(\psi_n^*\), integrate over the membrane, and integrate by parts; with the fixed-edge condition,
+\begin{equation}\boxed{\omega_n^2=\frac{T\int_A|\nabla\psi_n|^2\,dA}{\int_A\sigma(r)|\psi_n|^2\,dA}.}\end{equation}
+Mass added where a mode moves strongly increases the denominator and tends to lower that mode's frequency. Mass added near its nodal regions has less effect. Central loading can therefore alter \emph{relative} modal spacings rather than simply scaling every frequency together.
+
+\subsection{Perturbation theory: a quantum-mechanics analogy}
+For a small density change \(\sigma\to\sigma+\delta\sigma\), the first-order shift of a nondegenerate mode obeys
+\begin{equation}\boxed{\frac{\delta\omega_n}{\omega_n}=-\frac12\frac{\int_A\delta\sigma\,|\psi_n|^2\,dA}{\int_A\sigma\,|\psi_n|^2\,dA}+O(\delta\sigma^2).}\end{equation}
+This resembles a stationary-state perturbation calculation: a spatial perturbation changes an eigenvalue according to its overlap with an eigenfunction. The analogy must be interpreted with care: \(\sigma(r)\) is the weight of a generalized mechanical eigenproblem, not a potential energy term in a Schr\"odinger Hamiltonian. Degenerate modes require appropriate treatment within their degenerate subspace.
+
+\section{A reproducible numerical illustration}
+To expose this mechanism computationally, the accompanying Python script uses one-dimensional radial linear finite elements for each azimuthal index \(m\). The dimensionless density profile is a deliberately simple step model:
+\begin{equation}\rho(r)=\begin{cases}1+\eta,&0\le r<a,\\1,&a\le r\le R,\end{cases}\qquad a=0.38R.\end{equation}
+The radial weak formulation gives
+\begin{equation}\int_0^R\left(rF'_mG'_m+\frac{m^2}{r}F_mG_m\right)dr=\lambda\int_0^R\rho(r)r F_mG_m\,dr,\end{equation}
+with \(F_m(R)=0\) and regularity at \(r=0\); in dimensionless units \(\lambda=\omega^2 R^2\sigma_0/T\). Discretization yields \(K_m\bm v=\lambda M_m\bm v\). We sweep the extra central density \(\eta\), solve for a few modes of each \(m\), and divide their frequencies by the lowest frequency at the same \(\eta\).
+\fig{.96}{loading_sweep.pdf}{A simple central-loading sweep from the included finite-element code. Dashed lines mark integer frequency ratios. This is \emph{not} a fitted or measured tabla spectrum, nor does every density value yield an optimal harmonic series.}
+The result demonstrates \emph{differential modal shifts}. In more realistic mass-profile models, tuning the radius, density gradient, and layer structure can bring groups of low modes close to harmonic ratios. The modes producing successive apparent harmonics need not share the same azimuthal index, and multiple spatial modes may become nearly degenerate at a given spectral peak. Experimental and theoretical work reports approximately harmonic low-frequency modes in Indian drums \cite{raman1934,ramakrishnan1954,eigenspectra2009}.
+
+\subsection{A graded, syahi-like radial density profile}
+A sharp two-density step is useful for understanding the mechanism, but an actual syahi is built from layered material with a finite transition to the unweighted membrane. To illustrate the effect of a smoothly graded loading, we model the radial surface density as
+\begin{equation}
+\boxed{\frac{\sigma(r)}{\sigma_0}=1+\frac{\eta}{1+\exp[(r/R-a)/w]},}\qquad a=0.42,\quad w=0.045.
+\end{equation}
+Here \(a\) is the dimensionless effective patch radius, \(w\) controls the transition width, and \(\eta\) is the maximum additional areal density relative to the surrounding membrane. This \emph{syahi-like} profile is physically motivated by the layered, centrally loaded construction; it is \textbf{not an experimentally measured mass profile}, and the chosen parameters are not a fit to a particular instrument. The profile is radially symmetric, so it also omits the nonuniformities in an actual hand-made patch \cite{nonuniform2020}.
+
+We insert this smoothly varying density into the same radial generalized eigenvalue problem and recompute the low-lying modes as \(\eta\) increases. The figure shows both the mass profiles and the resulting dimensionless mode ratios.
+\fig{.99}{smooth_syahi_model.pdf}{A smooth, layered-syahi-inspired density model (left) and the corresponding calculated low-mode frequency ratios (right). Horizontal dashed lines represent integer ratios. The model demonstrates the physical trend, not measured tabla resonance frequencies. Reproduce using \texttt{python scripts/syahi\_profile.py}.}
+At \(\eta=0\), the first few ratios include approximately \(1,1.593,2.136,2.296\). At \(\eta=6\), the computed ratios in the displayed mode ordering are approximately \(1,1.894,2.864,2.860,3.876,3.733\). Thus several modes approach integer values and two distinct modes become nearly degenerate close to the third harmonic. Importantly, the fundamental mode itself shifts in absolute frequency; these ratios alone do not specify a pitch in hertz. The asymptotic values and apparent harmonicity depend substantially on the shape, radius, and density of the loading. A convincing instrument-specific prediction requires a measured density profile, calibrated tension, boundary conditions, and ideally air coupling.
+
+\section{What a tabla stroke actually excites}
+A strike is a spatially and temporally localized forcing of the membrane. Formally the transient displacement can be expanded as
+\begin{equation}u(\bm r,t)=\sum_n q_n(t)\psi_n(\bm r),\end{equation}
+where the modal coefficients depend on the strike's position and time profile, damping, and membrane--air coupling. For an impulsive force with spatial distribution \(g(\bm r)\), the excitation of mode \(n\) is proportional (after appropriate mass normalization) to its spatial overlap, \(F_n\propto\int_A g(\bm r)\psi_n(\bm r)\,dA\). A strike close to a nodal line of a particular mode therefore excites it weakly. The resulting mixture of modes determines the attack spectrum.
+
+A finger left against the membrane introduces a second, distinct effect: \emph{selective damping and a modified local boundary condition}. A useful phenomenological mode equation is
+\begin{equation}
+\ddot q_n+2(\gamma_n+\gamma_n^{\mathrm{finger}})\dot q_n+\omega_n^2q_n=F_n(t),
+\qquad \gamma_n^{\mathrm{finger}}\ \text{depends on finger position and mode shape}.
+\end{equation}
+For a small dissipative contact patch \(C\), a first approximation is \(\gamma_n^{\mathrm{finger}}\propto\int_C |\psi_n(\bm r)|^2\,dA\). It predicts stronger damping of modes whose antinodes overlap the finger, and weaker damping near nodes. Significant pressure can also shift frequencies and mix modes, so this diagonal damping picture is illustrative rather than exact. Lifting the finger quickly allows modes to ring; retaining contact suppresses selected modes and shortens their decay.
+
+This explains why a tabla player can produce many timbres from the same membrane. The specific acoustics of a bol depend on the playing tradition, hand geometry, strike location, and whether contact persists. For example, published modelling contrasts a centre-area stroke with an edge stroke that suppresses the fundamental; measured studies of \emph{Ta} and \emph{Tun} likewise find distinctive modal content \cite{air2017,bols2023}. One should not identify every named bol with a unique fixed mode: several modes usually contribute, and stroke naming varies across schools. Finger contact, strike position, and modal decay together help explain why \emph{Na}, \emph{Tin}, \emph{Tun}, and other bols sound different even on the same dayan.
+
+The resonant frequencies are not exactly harmonic, and the bayan is especially complex: its loading can be off-centre, and the body and air cavity matter. A coupled air--membrane analysis finds that air loading fine-tunes the right-hand drum's harmonicity and can be substantially more important for the left-hand drum \cite{air2017}. This is why a free membrane model is a useful starting point, not a complete acoustical prediction.
+
+\section{Suggested listening and measurement exercises}
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item Play a long, sustained C\(\sharp\) tone, followed by G\(\sharp\). Compare their blended pitch to C\(\sharp\) with F\(\sharp\) and C\(\sharp\) with D\(\sharp\).
+\item Record isolated strokes on the dayan using a sufficiently high sample rate (for example, 44.1 or 48 kHz). Inspect early-attack and late-decay windows separately, because their spectra differ.
+\item Compute a windowed FFT or spectrogram; report window length, sample rate, and frequency resolution \(\Delta f=f_s/N\). Label strong peaks as \emph{observed partials}, not automatically as integer harmonics.
+\item Compare observed partial frequencies with \(nf_0\). Quantify detuning \((f_{\mathrm{obs}}-nf_0)/(nf_0)\) for securely assigned mode groups.
+\item Vary the model's mass-profile parameters, compare modal ratios, and avoid treating the toy model as a precise physical reconstruction of a specific tabla.
+\end{enumerate}
+
+\section{Key conclusions}
+The fifth above C\(\sharp\) is G\(\sharp\), with a nearly 3:2 frequency ratio, giving nearly coincident third and second harmonics. Many other consonant intervals also have simple common-harmonic relationships. An ordinary circular membrane instead has Bessel-zero eigenfrequencies that are not integer-spaced. A tabla's carefully constructed loaded membrane changes modal effective masses and reshapes the eigenfrequency spectrum, enabling unusually pitch-like, near-harmonic resonances. Stroke technique, damping, asymmetry, and enclosed air affect the actual measured sound. The analytic and numerical descriptions provide complementary ways of connecting centuries of tabla craftsmanship to spectral theory.
+
+\addcontentsline{toc}{section}{References}
+\begin{thebibliography}{99}\small
+\bibitem{raman1920} C. V. Raman and S. Kumar, ``Musical Drums with Harmonic Overtones,'' \emph{Nature} \textbf{104}, 500 (1920). \href{https://doi.org/10.1038/104500a0}{doi:10.1038/104500a0}.
+\bibitem{raman1934} C. V. Raman, ``The Indian Musical Drums,'' \emph{Proceedings of the Indian Academy of Sciences, Section A} \textbf{1}, 179--188 (1934/1935 historical volume date; consult original record). \url{https://repository.ias.ac.in/50700/}.
+\bibitem{ramakrishnan1954} B. S. Ramakrishnan, ``Vibrations of Indian Musical Drums Regarded as Composite Membranes,'' (1954). \url{https://repository.ias.ac.in/39763/}.
+\bibitem{krishnamurthy1994} E. V. Krishnamurthy, ``A Study of Harmonic Overtones Produced in Indian Drums,'' \emph{Physics Education} (Oct.--Dec. 1994). \url{https://ed.iitm.ac.in/~raman/drums.pdf}.
+\bibitem{eigenspectra2009} ``The eigenspectra of Indian musical drums,'' \emph{Journal of the Acoustical Society of America} (2009). \url{https://pubmed.ncbi.nlm.nih.gov/19206860/}.
+\bibitem{air2017} S. Tiwari and A. Gupta, ``Effects of air loading on the acoustics of an Indian musical drum,'' \emph{Journal of the Acoustical Society of America} \textbf{141}, 2611 (2017). \href{https://doi.org/10.1121/1.4979782}{doi:10.1121/1.4979782}.
+\bibitem{spectral2016} ``Vibration analysis of a musical drum head under nonuniform density and tension using a spectral method,'' \emph{Acoustical Science and Technology} \textbf{37}, 295--302 (2016). \url{https://www.jstage.jst.go.jp/article/ast/37/6/37_E1556/_article}.
+\bibitem{bols2023} ``Analysis of /ta:/ and /tun/ bols of the tabla from a musical standpoint,'' \emph{Applied Acoustics} (2023/2024). \url{https://www.sciencedirect.com/science/article/pii/S0003682X23004346}.
+\bibitem{bayan2025} ``Analysing the bayan drum; its tuning, and its bols from a musical standpoint,'' \emph{Applied Acoustics} (2025). \url{https://www.sciencedirect.com/science/article/pii/S0003682X25000088}.
+\bibitem{nonuniform2020} ``Computing natural frequencies and mode shapes of a non-uniform circular membrane,'' \emph{Applied Mathematical Modelling} (2020). \url{https://www.sciencedirect.com/science/article/pii/S0093641320300811}.
+\end{thebibliography}
+\noindent\textit{Source note:} Entries with abbreviated author or pagination details intentionally use their linked publisher/archival records rather than invented metadata. Cross-check those entries before formal scholarly citation.
+\end{document}
