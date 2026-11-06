@@ -1,7 +1,7 @@
 # Mathematics of musical rhythm
 
-Standalone companion on Dirac combs, Fourier analysis of repeating pulse trains, cyclic phase, taal, modular tihai construction, layakari, and rhythmic symmetries.
+A companion tutorial on Dirac combs, Fourier analysis of pulse trains, teentaal and jhaptal cycles, cyclic phase, group theory, modular tihai construction, and layakari.
 
-The figures illustrate mathematical models rather than measured or canonical accent patterns. The distinction between cyclical organisation and actual performance practice is important.
+Run `python scripts/generate_figures.py` to generate five vector illustrations in `figures/` (after installing `requirements.txt`).
 
-This directory is being populated from the prepared LaTeX and Python source archive.
+**Status:** The full LaTeX manuscript and compiled PDF are prepared but not yet committed to this directory. Illustrations use idealized patterns, not measurements or universal accent prescriptions.
