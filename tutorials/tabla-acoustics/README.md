@@ -1,7 +1,5 @@
 # Tabla acoustics and syahi physics
 
-Illustrated introductory manuscript on harmonics, circular-membrane modes, Bessel functions, radial syahi loading, and differences between tabla bols.
+An introductory tutorial on harmonic spectra, musical consonance, circular-membrane eigenmodes, Bessel functions, syahi mass loading, and the effects of striking position and finger damping.
 
-The full compiled PDF, LaTeX manuscript, vector plots and Python simulation are available in the [project source archive](https://chatgpt.com/) prepared alongside this repository. This directory is being populated from that archive.
-
-**Model caveat:** syahi density profiles shown in the numerical example are idealized, not measured from a specific tabla.
+**Status:** The full LaTeX manuscript, compiled PDF, vector figures, and remaining plotting scripts are prepared but not yet committed to this directory. The numerical density profiles are illustrative, not measured from a specific tabla.
